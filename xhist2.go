@@ -135,7 +135,7 @@ func ProcessSymbol(underlying string, lookback int) bool {
 	}
 
 	//Next lets add ratings
-	AddRatings(underlying)
+	//AddRatings(underlying)
 	AddIVpercentiles(underlying)
 	AddExpectedMoves(underlying)
 	AddExpectedMovePercentiles(underlying)
@@ -227,10 +227,7 @@ func VolTrend(underlying string, lookback int) []mylib2.StockHistory {
 				break
 			}
 			if thisHistRec.UnderlyingPrice == 0 {
-				thisHistRec.UnderlyingPrice, err = strconv.ParseFloat(ATMOpt.UnderlyingPrice, 64)
-				if err != nil {
-					fmt.Printf("no price on %v\n", ATMOpt.OptionSymbol)
-				}
+				thisHistRec.UnderlyingPrice = ATMOpt.UnderlyingPrice
 			}
 
 			switch BucketRec.Bucket {
@@ -402,7 +399,11 @@ func VolTrend(underlying string, lookback int) []mylib2.StockHistory {
 		} else {
 			fmt.Printf("skipping %v %v\n", thisHistRec.Underlying, thisDate.Ddate)
 		}
-
+		/*
+			if math.Mod(float64(i), 100) == 0 {
+				fmt.Printf("Processed %v recs. %v\n", i, time.Now())
+			}
+		*/
 	}
 	return History
 }
