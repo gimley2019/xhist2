@@ -231,6 +231,22 @@ func VolTrend(underlying string, lookback int) []mylib2.StockHistory {
 			}
 
 			switch BucketRec.Bucket {
+			case 1:
+				if thisHistRec.Day1 == 0 {
+					thisHistRec.Day1 = ATMOpt.IV
+				}
+			case 2:
+				if thisHistRec.Day2 == 0 {
+					thisHistRec.Day2 = ATMOpt.IV
+				}
+			case 3:
+				if thisHistRec.Day3 == 0 {
+					thisHistRec.Day3 = ATMOpt.IV
+				}
+			case 4:
+				if thisHistRec.Day4 == 0 {
+					thisHistRec.Day4 = ATMOpt.IV
+				}
 			case 5:
 				if thisHistRec.Day5 == 0 {
 					thisHistRec.Day5 = ATMOpt.IV
@@ -242,6 +258,22 @@ func VolTrend(underlying string, lookback int) []mylib2.StockHistory {
 					thisHistRec.Day5Volume = ATMOpt.Volume
 					thisHistRec.Day5OpenInterest = ATMOpt.OpenInterest
 
+				}
+			case 6:
+				if thisHistRec.Day6 == 0 {
+					thisHistRec.Day6 = ATMOpt.IV
+				}
+			case 7:
+				if thisHistRec.Day7 == 0 {
+					thisHistRec.Day7 = ATMOpt.IV
+				}
+			case 8:
+				if thisHistRec.Day8 == 0 {
+					thisHistRec.Day8 = ATMOpt.IV
+				}
+			case 9:
+				if thisHistRec.Day9 == 0 {
+					thisHistRec.Day9 = ATMOpt.IV
 				}
 			case 10:
 				if thisHistRec.Day10 == 0 {
@@ -605,40 +637,40 @@ func AddIVpercentiles(symbol string) {
 					sliceStart := i - TDAYSANNUALY
 					slice = stockHist[sliceStart : i+1]
 				}
-				floats30 := mylib2.GetFloats("day30", slice)
+				floats30 := mylib2.FilterZeroIV(mylib2.GetFloats("day30", slice))
 				h.IVPercentile30 = MyPercentile(floats30, h.Day30)
 				h.Day30VoIV = mylib2.VoIV(floats30, TDAYSANNUALY)
-				floats60 := mylib2.GetFloats("day60", slice)
+				floats60 := mylib2.FilterZeroIV(mylib2.GetFloats("day60", slice))
 				h.IVPercentile60 = MyPercentile(floats60, h.Day60)
 				h.Day60VoIV = mylib2.VoIV(floats60, TDAYSANNUALY)
-				floats90 := mylib2.GetFloats("day90", slice)
+				floats90 := mylib2.FilterZeroIV(mylib2.GetFloats("day90", slice))
 				h.IVPercentile90 = MyPercentile(floats90, h.Day90)
 				h.Day90VoIV = mylib2.VoIV(floats90, TDAYSANNUALY)
-				floats120 := mylib2.GetFloats("day120", slice)
+				floats120 := mylib2.FilterZeroIV(mylib2.GetFloats("day120", slice))
 				h.IVPercentile120 = MyPercentile(floats120, h.Day120)
 				//if h.IVPercentile120 == 0 {
 				//	fmt.Printf("STOP FOR DEBUG")
 				//}
 				h.Day120VoIV = mylib2.VoIV(floats120, TDAYSANNUALY)
-				floats180 := mylib2.GetFloats("day180", slice)
+				floats180 := mylib2.FilterZeroIV(mylib2.GetFloats("day180", slice))
 				h.IVPercentile180 = MyPercentile(floats180, h.Day180)
 				h.Day180VoIV = mylib2.VoIV(floats180, TDAYSANNUALY)
-				floats240 := mylib2.GetFloats("day240", slice)
+				floats240 := mylib2.FilterZeroIV(mylib2.GetFloats("day240", slice))
 				h.IVPercentile240 = MyPercentile(floats240, h.Day240)
 				h.Day240VoIV = mylib2.VoIV(floats240, TDAYSANNUALY)
-				floats365 := mylib2.GetFloats("day365", slice)
+				floats365 := mylib2.FilterZeroIV(mylib2.GetFloats("day365", slice))
 				h.IVPercentile365 = MyPercentile(floats365, h.Day365)
 				h.Day365VoIV = mylib2.VoIV(floats365, TDAYSANNUALY)
-				floats480 := mylib2.GetFloats("day480", slice)
+				floats480 := mylib2.FilterZeroIV(mylib2.GetFloats("day480", slice))
 				h.IVPercentile480 = MyPercentile(floats480, h.Day480)
 				h.Day480VoIV = mylib2.VoIV(floats480, TDAYSANNUALY)
-				floats600 := mylib2.GetFloats("day600", slice)
+				floats600 := mylib2.FilterZeroIV(mylib2.GetFloats("day600", slice))
 				h.IVPercentile600 = MyPercentile(floats600, h.Day600)
 				h.Day600VoIV = mylib2.VoIV(floats600, TDAYSANNUALY)
-				floats730 := mylib2.GetFloats("day730", slice)
+				floats730 := mylib2.FilterZeroIV(mylib2.GetFloats("day730", slice))
 				h.IVPercentile730 = MyPercentile(floats730, h.Day730)
 				h.Day730VoIV = mylib2.VoIV(floats730, TDAYSANNUALY)
-				floats850 := mylib2.GetFloats("day850", slice)
+				floats850 := mylib2.FilterZeroIV(mylib2.GetFloats("day850", slice))
 				h.IVPercentile850 = MyPercentile(floats850, h.Day850)
 				h.Day850VoIV = mylib2.VoIV(floats850, TDAYSANNUALY)
 				// Calc IV percentile changes
@@ -774,7 +806,10 @@ func MyPercentile(data []float64, val float64) float64 {
 	var percentile float64
 
 	size = len(data)
-	for i < size-1 {
+	if size == 0 {
+		return 0
+	}
+	for i < size {
 		if data[i] < val {
 			below++
 		}
@@ -808,18 +843,17 @@ func CalcHistVolForPeriod(slice []mylib2.StockHistory, period int) (float64, flo
 			if i == 0 {
 				last = p
 				startprice = p
+				maxUp = p
+				maxDown = p
 			} else {
 				ret := math.Log(p / last)
 				returns = append(returns, ret)
 				last = p
-				// maxup/down logi
-				if p > startprice && p > maxUp {
+				// track highest/lowest price over the window
+				if p > maxUp {
 					maxUp = p
 				}
-				if p < startprice && (p < maxDown || maxDown == 0) {
-					if maxDown == -1 {
-						fmt.Printf("STOP")
-					}
+				if p < maxDown {
 					maxDown = p
 				}
 			}
